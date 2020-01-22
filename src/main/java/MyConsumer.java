@@ -7,12 +7,17 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.Properties;
 
 class MyConsumer {
-    public Consumer<Long, String> createConsumer(String topicName) {
+    private Consumer<Long, String> consumer = createConsumer(Constants.FIRST_TOPIC);
+
+    public Consumer<Long, String> getConsumer() {
+        return consumer;
+    }
+
+    Consumer<Long, String> createConsumer(String topicName) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKA_BROKERS);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
@@ -27,7 +32,6 @@ class MyConsumer {
     }
 
     ConsumerRecords<Long, String> runConsoleConsumer() {
-        Consumer<Long, String> consumer = createConsumer(Constants.FIRST_TOPIC);
         ConsumerRecords<Long, String> consumerRecordsToSend = null;
         while (Constants.RUNNING) {
             ConsumerRecords<Long, String> consumerRecords = consumer.poll(Duration.of(3, ChronoUnit.SECONDS));
@@ -37,7 +41,6 @@ class MyConsumer {
             consumer.commitAsync();
             consumerRecordsToSend = consumerRecords;
         }
-        consumer.close();
         return consumerRecordsToSend;
     }
 }

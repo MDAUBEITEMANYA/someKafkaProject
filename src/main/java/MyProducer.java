@@ -8,6 +8,11 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 public class MyProducer {
+    private Producer<Long, String> producer = createProducer();
+
+    public Producer<Long, String> getProducer() {
+        return producer;
+    }
 
     public Producer<Long, String> createProducer() {
         Properties properties = new Properties();
@@ -20,20 +25,16 @@ public class MyProducer {
     }
 
     public void runConsoleProducer(ConsumerRecords<Long, String> consumerRecords) {
-        Producer<Long, String> producer = createProducer();
         if (consumerRecords != null) {
             for (ConsumerRecord<Long, String> consumerRecord : consumerRecords) {
-                ProducerRecord<Long, String> record = new ProducerRecord<Long, String>(Constants.SECOND_TOPIC,
+                ProducerRecord<Long, String> record = new ProducerRecord<>(Constants.SECOND_TOPIC,
                         consumerRecord.value().toUpperCase());
                 try {
                     RecordMetadata metadata = producer.send(record).get();
-                } catch (ExecutionException e) {
-                    System.out.println("I really need to catch this exc" + e);
-                } catch (InterruptedException e) {
+                } catch (ExecutionException | InterruptedException e) {
                     System.out.println("I really need to catch this exc" + e);
                 }
             }
         }
-        producer.close();
     }
 }
